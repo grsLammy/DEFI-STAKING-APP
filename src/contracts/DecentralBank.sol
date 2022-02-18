@@ -15,7 +15,7 @@ contract DecentralBank {
   mapping(address => bool) public hasStaked;
   mapping(address => bool) public isStaking;
 
-constructor(RewardToken _rewardToken, Tether _tether) public {
+constructor(RewardToken _rewardToken, Tether _tether) {
     rewardToken = _rewardToken;
     tether = _tether;
     owner = msg.sender;
