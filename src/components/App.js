@@ -6,6 +6,7 @@ import React, {Component} from 'react';
 import Tether from '../truffle_abis/Tether.json'
 import RewardToken from '../truffle_abis/RewardToken.json'
 import DecentralBank from '../truffle_abis/DecentralBank.json'
+import ParticleSettings from './ParticleSettings';
 
 class App extends Component {
 
@@ -110,7 +111,15 @@ class App extends Component {
 	unstakeTokens = () => {
 		this.setState({loading: true})
 		this.state.decentralBank.methods.unstakeTokens().send({from:this.state.account}).on('transactionHash',(hash) => {
-			this.setState({loading: false})})
+			this.setState({loading: false})
+		})
+	}
+
+	issueTokens = () => {
+		this.setState({loading: true})
+		this.state.decentralBank.methods.issueTokens().send({from:this.state.account}).on('transactionHash',(hash) => {
+			this.setState({loading: false})
+		})
 	}
 
 
@@ -120,7 +129,7 @@ class App extends Component {
 	render() {
 		let content 
 		{this.state.loading ? content =
-		<p id='loader' className='text-center' style={{margin:'30'}}>
+		<p id='loader' className='text-center' style={{margin:'30', color:'white'}}>
 		LOADING PLEASE...</p> : content = 
 		<Main 
 			tetherBalance={this.state.tetherBalance}
@@ -128,9 +137,14 @@ class App extends Component {
 			stakingBalance={this.state.stakingBalance}
 			stakeTokens={this.stakeTokens}
 			unstakeTokens={this.unstakeTokens}
+			decentralBankContract={this.decentralBank}
+			issueTokens={this.issueTokens}
 		/>}
 		return(
-			<div>
+			<div class='App' style={{position:'relative'}}>
+				<div style={{position:'absolute'}}>
+					<ParticleSettings/>
+				</div>
 				<Navbar account={this.state.account}/>
 				<div className='container-fluid mt-5'>
 					<div className='row'>
@@ -138,7 +152,7 @@ class App extends Component {
 							<div>
 								{content}
 							</div>
-						</main>
+						</main> 
 					</div>
 				</div>
 			</div>

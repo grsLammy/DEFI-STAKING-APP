@@ -4,73 +4,76 @@ import './RewardToken.sol';
 import './Tether.sol';
 
 contract DecentralBank {
-  string public name = 'Decentral Bank';
-  address public owner;
-  Tether public tether;
-  RewardToken public rewardToken;
+    string public name = 'Decentral Bank';
+    address public owner;
+    Tether  public tether;
+    RewardToken public rewardToken;
 
-  address[] public stakers;
+    address[] public stakers;
 
-  mapping(address => uint) public stakingBalance;
-  mapping(address => bool) public hasStaked;
-  mapping(address => bool) public isStaking;
+    mapping(address => uint) public stakingBalance;
+    mapping(address => bool) public hasStaked;
+    mapping(address => bool) public isStaking;
 
-constructor(RewardToken _rewardToken, Tether _tether) {
-    rewardToken = _rewardToken;
-    tether = _tether;
-    owner = msg.sender;
-}
+    constructor(RewardToken _rewardToken, Tether _tether) public {
+        rewardToken = _rewardToken;
+        tether = _tether;
+        owner = msg.sender;
+    }
 
-  // staking function   
-function depositTokens(uint _amount) public {
+    // staking function
+    function depositTokens(uint _amount) public {
+        // require staking amount to be greater than zero
+        require(_amount > 0, 'amount cannot be 0');
 
-  // require staking amount to be greater than zero
-    require(_amount > 0, 'amount cannot be 0');
-  
-  // Transfer tether tokens to this contract address for staking
-  tether.transferFrom(msg.sender, address(this), _amount);
+        // Transfer tether tokens to this contract address for staking
+        tether.transferFrom(msg.sender, address(this), _amount);
 
-  // Update Staking Balance
-  stakingBalance[msg.sender] = stakingBalance[msg.sender] + _amount;
+        // Update Staking Balance
+        stakingBalance[msg.sender] = stakingBalance[msg.sender] + _amount;
 
-  if(!hasStaked[msg.sender]) {
-    stakers.push(msg.sender);
-  }
+        if(!hasStaked[msg.sender]){
+            stakers.push(msg.sender);
+        }
 
-  // Update Staking Balance
-    isStaking[msg.sender] = true;
-    hasStaked[msg.sender] = true;
-}
+        // Update Staking Balance
+        isStaking[msg.sender] = true;
+        hasStaked[msg.sender] = true;
+    }
 
-  // unstake tokens
-  function unstakeTokens() public {
-    uint balance = stakingBalance[msg.sender];
-    // require the amount to be greater than zero
-    require(balance > 0, 'staking balance cannot be less than zero');
+    // unstake tokens
+    function unstakeTokens() public {
+        uint balance = stakingBalance[msg.sender];
+        // require the amount to be greater than zero
+        require(balance > 0, 'staking balance cannot be less than zero');
 
-    // transfer the tokens to the specified contract address from our bank
-    tether.transfer(msg.sender, balance);
+        // transfer the tokens to the specified contract address from our bank
+        tether.transfer(msg.sender, balance);
 
-    // reset staking balance
-    stakingBalance[msg.sender] = 0;
+        // reset staking balance
+        stakingBalance[msg.sender] = 0;
 
-    // Update Staking Status
-    isStaking[msg.sender] = false;
+        // Update Staking Status
+        isStaking[msg.sender] = false;
+    }
 
-  }
+    // issue rewards
+    function issueTokens() public {
+        // Only owner can call this function
+        require(msg.sender == owner, 'caller must be the owner');
 
-  // issue rewards
-        function issueTokens() public {
-            // Only owner can call this function
-            require(msg.sender == owner, 'caller must be the owner');
+        // issue tokens to all stakers
+        for (uint i=0; i<stakers.length; i++) {
+            address recipient = stakers[i]; 
+            uint balance = stakingBalance[recipient] / 9;
 
-            // issue tokens to all stakers
-            for (uint i=0; i<stakers.length; i++) {
-                address recipient = stakers[i]; 
-                uint balance = stakingBalance[recipient] / 9;
-                if(balance > 0) {
+            if(balance > 0) {
                 rewardToken.transfer(recipient, balance);
+
             }
-       }
-       }
+
+        }
+
+    }
+
 }

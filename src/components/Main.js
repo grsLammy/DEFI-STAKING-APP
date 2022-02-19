@@ -1,5 +1,6 @@
 import React, {Component} from 'react'  
 import tether from '../tether.png'
+import Airdrop from './Airdrop'
 
 class Main extends Component {
     render() {
@@ -7,13 +8,13 @@ class Main extends Component {
             <div id='content' className='mt-3'>
                 <table className='table text-muted text-center'>
                     <thead>
-                        <tr style={{color:'black'}}>
+                        <tr style={{color:'white'}}>
                             <th scope='col'>Staking Balance</th>
                             <th scope='col'>Reward Balance</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr style={{color:'black'}}>
+                        <tr style={{color:'white'}}>
                             <td>{window.web3.utils.fromWei(this.props.stakingBalance, 'Ether')} USDT</td>
                             <td>{window.web3.utils.fromWei(this.props.rewardTokenBalance, 'Ether')} REWARD</td>
                         </tr>
@@ -31,13 +32,13 @@ class Main extends Component {
                         <div style={{borderSpacing:'0 1em'}}>
                             <label className='float-left' style={{marginLeft:'15px'}}><b>Stake Tokens</b></label>
                             <span className='float-right' style={{marginRight:'8px'}}>Balance: {window.web3.utils.fromWei(this.props.tetherBalance,'Ether')}</span>
-                            <div className='input-group mb-4'>
-                                <input
+                            <div className='input-group mb-4' style={{marginLeft:'10px'}}>
+                                <input 
                                 ref={(input) => {this.input = input}}
                                 type='text'
                                 placeholder='0'
                                 required/>
-                                <div className='input-group-open'>
+                                <div className='input-group-open' style={{marginLeft:'10px'}} >
                                     <div className='input-group-text'>
                                     USDT&nbsp;<img  src={tether} alt='tether' height='32'/>
                                         
@@ -54,7 +55,12 @@ class Main extends Component {
                         this.props.unstakeTokens()
                     }}
                     className='btn btn-primary btn-lg btn-block'>WITHDRAW</button>
-                    <div className='card-body text-center' style={{color:'blue'}}>AIRDROP</div>
+                    <div className='card-body text-center' style={{color:'blue'}}>AIRDROP
+                    <Airdrop 
+                    stakingBalance={this.props.stakingBalance}
+                    decentralBankContract={this.props.decentralBankContract}
+                    issueTokens={this.props.issueTokens}/>
+                    </div>
                 </div>
             </div>
         )
