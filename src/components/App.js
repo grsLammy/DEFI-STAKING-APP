@@ -1,7 +1,8 @@
-import React, {Component} from 'react';
-import Navbar from './Navbar'
-import Web3 from 'web3'
 import './App.css'
+import Web3 from 'web3'
+import Main from './Main.js'
+import Navbar from './Navbar'
+import React, {Component} from 'react';
 import Tether from '../truffle_abis/Tether.json'
 import RewardToken from '../truffle_abis/RewardToken.json'
 import DecentralBank from '../truffle_abis/DecentralBank.json'
@@ -86,18 +87,59 @@ class App extends Component {
 		}
 
 		this.setState({loading: false})
-
 	}
+
+	//Two function, one that stakes and other one than unstakes
+	//using our decentralBank contract - to deposit tokens and unstaking
+	//All of this is for staking:
+	//depositTokens transferFrom ...
+	//function approve transaction hash
+	// STAKING FUNCTION ?? >> decentralBank.depositTokens(send transactionHash =>)
+
+	//staking function
+	stakeTokens = (amount) => {
+		this.setState({loading: true})
+		this.state.tether.methods.approve(this.state.decentralBank._address, amount).send({from:this.state.account}).on('transactionHash', (hash) => {
+			this.state.decentralBank.methods.depositTokens(amount).send({from:this.state.account}).on('transactionHash', (hash) => {
+				this.setState({loading: false})
+			})	
+		})	
+	}	
+
+	//unstaking function
+	unstakeTokens = () => {
+		this.setState({loading: true})
+		this.state.decentralBank.methods.unstakeTokens().send({from:this.state.account}).on('transactionHash',(hash) => {
+			this.setState({loading: false})})
+	}
+
+
+
 
 	//Our react code goes in here!
 	render() {
+		let content 
+		{this.state.loading ? content =
+		<p id='loader' className='text-center' style={{margin:'30'}}>
+		LOADING PLEASE...</p> : content = 
+		<Main 
+			tetherBalance={this.state.tetherBalance}
+			rewardTokenBalance={this.state.rewardTokenBalance}
+			stakingBalance={this.state.stakingBalance}
+			stakeTokens={this.stakeTokens}
+			unstakeTokens={this.unstakeTokens}
+		/>}
 		return(
 			<div>
 				<Navbar account={this.state.account}/>
-				<div>
-					<h1>
-
-					</h1>
+				<div className='container-fluid mt-5'>
+					<div className='row'>
+						<main role='main' className='col-lg-12 ml-auto mr-auto' style={{maxWidth:'600px',minHeight:'100vm'}}>
+							<div>
+								{content}
+							</div>
+						</main>
+					</div>
 				</div>
 			</div>
 		)
