@@ -60,7 +60,7 @@ contract DecentralBank {
     // issue rewards
     function issueTokens() public {
         // Only owner can call this function
-        // require(msg.sender == owner, 'caller must be the owner');
+        //require(msg.sender == owner, 'caller must be the owner');
 
         // issue tokens to all stakers
         for (uint i=0; i<stakers.length; i++) {
