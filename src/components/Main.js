@@ -6,6 +6,7 @@ class Main extends Component {
     render() {
         return(
             <div id='content' className='mt-3'>
+
                 <table className='table text-muted text-center'>
                     <thead>
                         <tr style={{color:'white'}}>
@@ -13,6 +14,7 @@ class Main extends Component {
                             <th scope='col'>Reward Balance</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         <tr style={{color:'white'}}>
                             <td>{window.web3.utils.fromWei(this.props.stakingBalance, 'Ether')} USDT</td>
@@ -20,15 +22,17 @@ class Main extends Component {
                         </tr>
                     </tbody>
                 </table>
+                
                 <div className='card mb=2' style={{opacity:'-moz-initial.9'}}>
+
                     <form
-                    onSubmit={(event) => {
+                        onSubmit={(event) => {
                         event.preventDefault()
                         let amount = this.input.value.toString()
                         amount = window.web3.utils.toWei(amount,'Ether')
                         this.props.stakeTokens(amount)
-                    }}
-                    className='mb-3'>
+                        }}
+                        className='mb-3'>
                         <div style={{borderSpacing:'0 1em'}}>
                             <label className='float-left' style={{marginLeft:'15px'}}><b>Stake Tokens</b></label>
                             <span className='float-right' style={{marginRight:'8px'}}>Balance: {window.web3.utils.fromWei(this.props.tetherBalance,'Ether')}</span>
@@ -40,7 +44,7 @@ class Main extends Component {
                                 required/>
                                 <div className='input-group-open' style={{marginLeft:'10px'}} >
                                     <div className='input-group-text'>
-                                    USDT&nbsp;<img  src={tether} alt='tether' height='32'/>
+                                        USDT&nbsp;<img  src={tether} alt='tether' height='32'/>
                                         
                                     </div>
                                 </div>
@@ -48,6 +52,7 @@ class Main extends Component {
                             <button type='submit' className='btn btn-primary btn-lg btn-block'>DEPOSIT</button>
                         </div>
                     </form>
+
                     <button
                     type='submit'
                     onClick={(event) => {
@@ -55,11 +60,11 @@ class Main extends Component {
                         this.props.unstakeTokens()
                     }}
                     className='btn btn-primary btn-lg btn-block'>WITHDRAW</button>
+
                     <div className='card-body text-center' style={{color:'blue'}}>AIRDROP
-                    <Airdrop 
-                    stakingBalance={this.props.stakingBalance}
-                    decentralBankContract={this.props.decentralBankContract}
-                    issueTokens={this.props.issueTokens}/>
+                        <Airdrop 
+                        stakingBalance={this.props.stakingBalance}
+                        issueTokens={this.props.issueTokens}/>
                     </div>
                 </div>
             </div>

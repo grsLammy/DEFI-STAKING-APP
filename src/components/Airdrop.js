@@ -11,7 +11,7 @@ class Airdrop extends Component {
     }
 
     startTimer() {
-        if(this.timer == 0 && this.state.seconds > 0) {
+        if(this.timer === 0 && this.state.seconds > 0) {
             this.timer = setInterval(this.countDown, 1000)
         }
     }
@@ -25,7 +25,7 @@ class Airdrop extends Component {
             seconds: seconds
         })
         // 2. stop counting when we hit zero
-        if(seconds == 0) {
+        if(seconds === 0) {
             this.props.issueTokens()
             clearInterval(this.timer)
         }

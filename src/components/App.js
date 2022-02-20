@@ -59,7 +59,7 @@ class App extends Component {
 			this.setState({tether})
 			let tetherBalance = await tether.methods.balanceOf(this.state.account).call()
 			this.setState({tetherBalance: tetherBalance.toString()})
-			console.log('Tether balance:',this.state.tetherBalance)
+			//console.log('Tether balance:',this.state.tetherBalance)
 		} else {
 			window.alert('Tether not deployed to the network')
 		}
@@ -145,7 +145,7 @@ class App extends Component {
 			issueTokens={this.issueTokens}
 		/>}
 		return(
-			<div class='App' style={{position:'relative'}}>
+			<div className='App' style={{position:'relative'}}>
 				<div style={{position:'absolute'}}>
 					<ParticleSettings/>
 				</div>
