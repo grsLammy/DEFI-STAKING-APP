@@ -85,6 +85,7 @@ class App extends Component {
 			this.setState({stakingBalance: stakingBalance.toString()})
 			//console.log('Staking balance:',this.state.stakingBalance)
 			const decentralBankOwner = await decentralBank.methods.owner().call()
+			this.setState({decentralBankOwner: decentralBankOwner})
 			console.log('msg.owner: ',this.state.decentralBankOwner)
 		} else {
 			window.alert('Decentral Bank not deployed to the network')
