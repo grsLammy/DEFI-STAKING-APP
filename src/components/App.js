@@ -24,7 +24,6 @@ class App extends Component {
 			tetherBalance: '0',
 			rewardTokenBalance: '0',
 			stakingBalance: '0',
-			decentralBankOwner: '0x0',
 			account: '0x0',
 			loading: true
 		}
@@ -84,9 +83,6 @@ class App extends Component {
 			let stakingBalance = await decentralBank.methods.stakingBalance(this.state.account).call()
 			this.setState({stakingBalance: stakingBalance.toString()})
 			//console.log('Staking balance:',this.state.stakingBalance)
-			const decentralBankOwner = await decentralBank.methods.owner().call()
-			this.setState({decentralBankOwner: decentralBankOwner})
-			console.log('msg.owner: ',this.state.decentralBankOwner)
 		} else {
 			window.alert('Decentral Bank not deployed to the network')
 		}
@@ -141,7 +137,6 @@ class App extends Component {
 			stakingBalance={this.state.stakingBalance}
 			stakeTokens={this.stakeTokens}
 			unstakeTokens={this.unstakeTokens}
-			decentralBankContract={this.decentralBank}
 			issueTokens={this.issueTokens}
 		/>}
 		return(
