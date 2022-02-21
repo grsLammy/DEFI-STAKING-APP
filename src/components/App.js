@@ -103,6 +103,7 @@ class App extends Component {
 		this.state.tether.methods.approve(this.state.decentralBank._address, amount).send({from:this.state.account}).on('transactionHash', (hash) => {
 			this.state.decentralBank.methods.depositTokens(amount).send({from:this.state.account}).on('transactionHash', (hash) => {
 				this.setState({loading: false})
+				document.location.reload(true)
 			})	
 		})	
 	}	
@@ -112,6 +113,7 @@ class App extends Component {
 		this.setState({loading: true})
 		this.state.decentralBank.methods.unstakeTokens().send({from:this.state.account}).on('transactionHash',(hash) => {
 			this.setState({loading: false})
+			document.location.reload(true)
 		})
 	}
 
@@ -119,11 +121,9 @@ class App extends Component {
 		this.setState({loading: true})
 		this.state.decentralBank.methods.issueTokens().send({from:this.state.account}).on('transactionHash',(hash) => {
 			this.setState({loading: false})
+			document.location.reload(true)
 		})
 	}
-
-
-
 
 	//Our react code goes in here!
 	render() {
