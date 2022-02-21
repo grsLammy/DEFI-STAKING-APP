@@ -1,24 +1,23 @@
-const RewardToken = artifacts.require('RewardToken')
-const Tether = artifacts.require('Tether')
-const DecentralBank = artifacts.require('DecentralBank')
+const Tether = artifacts.require("Tether");
+const RewardToken = artifacts.require("RewardToken");
+const DecentralBank = artifacts.require("DecentralBank");
 
-module.exports = async function(deployer, network, accounts) {
-  
-  // Deploy Mock Tether Token
+module.exports = async function (deployer, network, accounts) {
+  //deploy mock Tether contract
   await deployer.deploy(Tether)
   const tether = await Tether.deployed()
 
-  // Deploy RewardToken Token
+  //deploy RewardToken contract
   await deployer.deploy(RewardToken)
   const rewardToken = await RewardToken.deployed()
 
-  // Deploy DecentralBank
+  //deploy DecentralBank contract
   await deployer.deploy(DecentralBank, rewardToken.address, tether.address)
   const decentralBank = await DecentralBank.deployed()
 
-  // Transfer all tokens to DecentralBank (1 million)
+  //Transfer RewardToken to Decentral Bank
   await rewardToken.transfer(decentralBank.address, '1000000000000000000000000')
 
-  // Transfer 100 Mock Tether tokens to investor
-  await tether.transfer(accounts[1], '100000000000000000000')
-}
+  //Distribute 100 Tether tokens to investor
+  await tether.transfer(accounts[1],'100000000000000000000')
+};
