@@ -60,7 +60,7 @@ contract('DecentralBank', ([owner, customer]) => {
             assert.equal(result.toString(), tokens('100'), 'customer mock wallet balance before staking')
             
             //Check Staking For Customer of 100 tokens
-            await tether.approve(decentralBank.address, tokens('100'), {from: customer})
+            await tether.approval(decentralBank.address, tokens('100'), {from: customer})
             await decentralBank.depositTokens(tokens('100'), {from: customer})
 
             //Check Updated Balance of Customer

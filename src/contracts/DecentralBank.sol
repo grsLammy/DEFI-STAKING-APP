@@ -15,7 +15,7 @@ contract DecentralBank {
     mapping(address => bool) public hasStaked;
     mapping(address => bool) public isStaking;
 
-    constructor(RewardToken _rewardToken, Tether _tether) public {
+    constructor(RewardToken _rewardToken, Tether _tether) {
         rewardToken = _rewardToken;
         tether = _tether;
         owner = msg.sender;
@@ -27,7 +27,7 @@ contract DecentralBank {
         require(_amount > 0, 'amount cannot be 0');
 
         // Transfer tether tokens to this contract address for staking
-        tether.transferFrom(msg.sender, address(this), _amount);
+        tether.thirdPartyTransfer(msg.sender, address(this), _amount);
 
         // Update Staking Balance
         stakingBalance[msg.sender] = stakingBalance[msg.sender] + _amount;

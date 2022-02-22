@@ -2,56 +2,46 @@
 pragma solidity >=0.4.22 <0.9.0;
 
 contract RewardToken {
-    string  public name = "Reward Token";
-    string  public symbol = "RWD";
-    uint256 public totalSupply = 1000000000000000000000000; // 1 million tokens
-    uint8   public decimals = 18;
-
-    event Transfer(
-        address indexed _from,
-        address indexed _to, 
-        uint _value
-    );
-
-    event Approval(
-        address indexed _owner,
-        address indexed _spender, 
-        uint _value
-    );
+    address public owner;
+    string public name = 'Reward Token';
+    string public symbol = 'RWD';
+    uint256 public totalSupply = 1000000000000000000000000;
+    uint8 public decimals = 18;
 
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
-    
-    constructor() public {
-        balanceOf[msg.sender] = totalSupply;
+
+    event Transfer(address indexed transferFrom, address indexed transferTo, uint256 transferAmount);
+    event Approval(address indexed owner, address indexed approvalTo, uint256 approvalAmount);
+
+    constructor() {
+        owner = msg.sender;
+        balanceOf[owner] = totalSupply;
     }
 
-    function transfer(address _to, uint256 _value) public returns (bool success) {
-        // require that the value is greater or equal for transfer
-        require(balanceOf[msg.sender] >= _value);
-         // transfer the amount and subtract the balance
-        balanceOf[msg.sender] -= _value;
-        // add the balance
-        balanceOf[_to] += _value;
-        emit Transfer(msg.sender, _to, _value);
+    function approval(address _approvalTo, uint256 _approvalAmount) public returns (bool success) {
+        require(_approvalAmount <= balanceOf[msg.sender], 'The amount entered is invalid');
+        allowance[msg.sender][_approvalTo] = _approvalAmount;
+        emit Approval(msg.sender, _approvalTo, _approvalAmount);
         return true;
     }
 
-    function approve(address _spender, uint256 _value) public returns (bool success) {
-        allowance[msg.sender][_spender] = _value;
-        emit Approval(msg.sender, _spender, _value);
+    function transfer(address _transferTo, uint256 _transferAmount ) public returns (bool success) {
+        require(_transferAmount <= balanceOf[msg.sender], 'The amount entered is invalid');
+        balanceOf[_transferTo] += _transferAmount;
+        balanceOf[msg.sender] -= _transferAmount;
+        emit Transfer(msg.sender, _transferTo, _transferAmount);
         return true;
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        require(_value <= balanceOf[_from]);
-        require(_value <= allowance[_from][msg.sender]);
-        // add the balance for transferFrom
-        balanceOf[_to] += _value;
-        // subtract the balance for transferFrom
-        balanceOf[_from] -= _value;
-        allowance[_from][msg.sender] -= _value;
-        emit Transfer(_from, _to, _value);
+    function thirdPartyTransfer(address _transferFrom, address _transferTo, uint256 _transferAmount) public returns (bool success) {
+        require(_transferAmount <= balanceOf[_transferFrom], 'The amount entered is invalid');
+        require(_transferAmount <= allowance[_transferFrom][msg.sender], 'The amount entered does not matches with the allowance amount');
+        balanceOf[_transferTo] += _transferAmount;
+        balanceOf[_transferFrom] -= _transferAmount;
+        allowance[_transferFrom][msg.sender] -= _transferAmount;
+        emit Transfer(_transferFrom, _transferTo, _transferAmount);
         return true;
+
     }
 }
