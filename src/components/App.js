@@ -21,10 +21,11 @@ class App extends Component {
 			tether: {},
 			rewardToken: {},
 			decentralBank: {},
+			bankOwnerAccount: '0x0',
 			tetherBalance: '0',
 			rewardTokenBalance: '0',
 			stakingBalance: '0',
-			account: '0x0',
+			customerAccount: '0x0',
 			loading: true
 		}
 	}
@@ -46,9 +47,9 @@ class App extends Component {
 
 	async loadBlockchainData() {
 		const web3 = window.web3 
-		const account = await web3.eth.requestAccounts()
-		this.setState({account: account[0]})
-		//console.log('Account:', this.state.account)
+		const customerAccount = await web3.eth.requestAccounts()
+		this.setState({customerAccount: customerAccount[0]})
+		//console.log('Account:', this.state.customerAccount)
 		const networkId = await web3.eth.net.getId()
 
 		//load Tether Contract
@@ -56,7 +57,8 @@ class App extends Component {
 		if(tetherData) {
 			const tether = new web3.eth.Contract(Tether.abi, tetherData.address)
 			this.setState({tether})
-			let tetherBalance = await tether.methods.balanceOf(this.state.account).call()
+
+			let tetherBalance = await tether.methods.balanceOf(this.state.customerAccount).call()
 			this.setState({tetherBalance: tetherBalance.toString()})
 			//console.log('Tether balance:',this.state.tetherBalance)
 		} else {
@@ -68,7 +70,7 @@ class App extends Component {
 		if(rewardTokenData) {
 			const rewardToken = new web3.eth.Contract(RewardToken.abi,rewardTokenData.address)
 			this.setState({rewardToken})
-			let rewardTokenBalance = await rewardToken.methods.balanceOf(this.state.account).call()
+			let rewardTokenBalance = await rewardToken.methods.balanceOf(this.state.customerAccount).call()
 			this.setState({rewardTokenBalance: rewardTokenBalance.toString()})
 			//console.log('Reward Token balance:',this.state.rewardTokenBalance)
 		} else {
@@ -80,7 +82,10 @@ class App extends Component {
 		if(decentralBankData) {
 			const decentralBank = new web3.eth.Contract(DecentralBank.abi, decentralBankData.address)
 			this.setState({decentralBank})
-			let stakingBalance = await decentralBank.methods.stakingBalance(this.state.account).call()
+			let bankOwnerAccount = await decentralBank.methods.owner().call()
+			this.setState({bankOwnerAccount: bankOwnerAccount})
+			console.log('Bank Owner address:',this.state.bankOwnerAccount)
+			let stakingBalance = await decentralBank.methods.stakingBalance(this.state.customerAccount).call()
 			this.setState({stakingBalance: stakingBalance.toString()})
 			//console.log('Staking balance:',this.state.stakingBalance)
 		} else {
@@ -100,8 +105,8 @@ class App extends Component {
 	//staking function
 	stakeTokens = (amount) => {
 		this.setState({loading: true})
-		this.state.tether.methods.approval(this.state.decentralBank._address, amount).send({from:this.state.account}).on('transactionHash', (hash) => {
-			this.state.decentralBank.methods.depositTokens(amount).send({from:this.state.account}).on('transactionHash', (hash) => {
+		this.state.tether.methods.approval(this.state.decentralBank._address, amount).send({from:this.state.customerAccount}).on('transactionHash', (hash) => {
+			this.state.decentralBank.methods.depositTokens(amount).send({from:this.state.customerAccount}).on('transactionHash', (hash) => {
 				this.setState({loading: false})
 				document.location.reload(true)
 			})	
@@ -111,7 +116,7 @@ class App extends Component {
 	//unstaking function
 	unstakeTokens = () => {
 		this.setState({loading: true})
-		this.state.decentralBank.methods.unstakeTokens().send({from:this.state.account}).on('transactionHash',(hash) => {
+		this.state.decentralBank.methods.unstakeTokens().send({from: this.state.customerAccount}).on('transactionHash',(hash) => {
 			this.setState({loading: false})
 			document.location.reload(true)
 		})
@@ -119,7 +124,7 @@ class App extends Component {
 
 	issueTokens = () => {
 		this.setState({loading: true})
-		this.state.decentralBank.methods.issueTokens().send({from:this.state.account}).on('transactionHash',(hash) => {
+		this.state.decentralBank.methods.issueTokens().send({from: this.state.customerAccount}).on('transactionHash',(hash) => {
 			this.setState({loading: false})
 			document.location.reload(true)
 		})
@@ -144,7 +149,7 @@ class App extends Component {
 				<div style={{position:'absolute'}}>
 					<ParticleSettings/>
 				</div>
-				<Navbar account={this.state.account}/>
+				<Navbar customerAccount={this.state.customerAccount}/>
 				<div className='container-fluid mt-5'>
 					<div className='row'>
 						<main role='main' className='col-lg-12 ml-auto mr-auto' style={{maxWidth:'600px',minHeight:'100vm'}}>
