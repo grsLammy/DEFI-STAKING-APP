@@ -55,7 +55,7 @@ class App extends Component {
 		if(tetherData) {
 			const tether = new web3.eth.Contract(Tether.abi, tetherData.address)
 			this.setState({tether})
-			let tetherBalance = await tether.methods.balanceOf(this.state.customerAccount).call()
+			let tetherBalance = await tether.methods._accountBalance(this.state.customerAccount).call()
 			this.setState({tetherBalance: tetherBalance.toString()})
 		} else {
 			window.alert('Tether not deployed to the network')
@@ -66,7 +66,7 @@ class App extends Component {
 		if(rewardTokenData) {
 			const rewardToken = new web3.eth.Contract(RewardToken.abi,rewardTokenData.address)
 			this.setState({rewardToken})
-			let rewardTokenBalance = await rewardToken.methods.balanceOf(this.state.customerAccount).call()
+			let rewardTokenBalance = await rewardToken.methods._accountBalance(this.state.customerAccount).call()
 			this.setState({rewardTokenBalance: rewardTokenBalance.toString()})
 		} else {
 			window.alert('Reward Token not deployed to the network')
@@ -77,7 +77,7 @@ class App extends Component {
 		if(decentralBankData) {
 			const decentralBank = new web3.eth.Contract(DecentralBank.abi, decentralBankData.address)
 			this.setState({decentralBank})
-			let stakingBalance = await decentralBank.methods.stakingBalance(this.state.customerAccount).call()
+			let stakingBalance = await decentralBank.methods._stakingBalance(this.state.customerAccount).call()
 			this.setState({stakingBalance: stakingBalance.toString()})
 		} else {
 			window.alert('Decentral Bank not deployed to the network')
@@ -89,8 +89,8 @@ class App extends Component {
 	//staking function
 	stakeTokens = (amount) => {
 		this.setState({loading: true})
-		this.state.tether.methods.approval(this.state.decentralBank._address, amount).send({from:this.state.customerAccount}).on('transactionHash', (hash) => {
-			this.state.decentralBank.methods.depositTokens(amount).send({from:this.state.customerAccount}).on('transactionHash', (hash) => {
+		this.state.tether.methods._approval(this.state.decentralBank._address, amount).send({from:this.state.customerAccount}).on('transactionHash', (hash) => {
+			this.state.decentralBank.methods._stakeTokens(amount).send({from:this.state.customerAccount}).on('transactionHash', (hash) => {
 				this.setState({loading: false})
 				document.location.reload(true)
 			})	
@@ -100,7 +100,7 @@ class App extends Component {
 	//unstaking function
 	unstakeTokens = () => {
 		this.setState({loading: true})
-		this.state.decentralBank.methods.unstakeTokens().send({from: this.state.customerAccount}).on('transactionHash',(hash) => {
+		this.state.decentralBank.methods._unstakeTokens().send({from: this.state.customerAccount}).on('transactionHash',(hash) => {
 			this.setState({loading: false})
 			document.location.reload(true)
 		})

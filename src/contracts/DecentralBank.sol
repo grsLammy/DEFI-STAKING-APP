@@ -1,79 +1,75 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.4.22 <0.9.0;
+pragma solidity >=0.5.0 <0.9.0;
 import './RewardToken.sol';
 import './Tether.sol';
 
 contract DecentralBank {
-    string public name = 'Decentral Bank';
-    address public owner;
-    Tether  public tether;
-    RewardToken public rewardToken;
 
-    address[] public stakers;
+    address public _owner;                                                               // Intialize owner
+    string public _name = 'Decentral Bank';                                              // Name of the bank
+    Tether public _Tether;                                                               // Local variable to store Tether contract address as a Tether datatype
+    RewardToken public _RewardToken;                                                     // Local variable to store RewardToken contract address as a RewardToken datatype
 
-    mapping(address => uint) public stakingBalance;
-    mapping(address => bool) public hasStaked;
-    mapping(address => bool) public isStaking;
+    //address of account staking
+    address[] public _stakers;
 
+    mapping(address => uint256) public _stakingBalance;                                  // Stores staking balance of respected accounts
+    mapping(address => bool) public _hasStaked;                                          // Stores true for the respected accounts if the account has staked previously, false otherwise
+    mapping(address => bool) public _isStaking;                                          // Stores true for the respected accounts if the account is currently staking, false otherwise
+
+    // Initialize an instance of the DecentralBank contract.
+    // While passing the contract address of Tether and RewardToken
     constructor(RewardToken _rewardToken, Tether _tether) {
-        rewardToken = _rewardToken;
-        tether = _tether;
-        owner = msg.sender;
+        _owner = msg.sender;                                                             // Intialize the msg.sender as the owner
+        _Tether = _tether;                                                               // Intialize the Tether contract address to local variable
+        _RewardToken = _rewardToken;                                                     // Intialize the RewardToken contract address to local variable
     }
 
-    // staking function
-    function depositTokens(uint _amount) public {
+    // Function to stake tokens
+    function _stakeTokens(uint256 _stakingAmount) public {
+
         // require staking amount to be greater than zero
-        require(_amount > 0, 'amount cannot be 0');
-
+        require(_stakingAmount > 0, 'Cannot stake 0 token');                            
+ 
         // Transfer tether tokens to this contract address for staking
-        tether.thirdPartyTransfer(msg.sender, address(this), _amount);
+        _Tether._thirdPartyTransfer(msg.sender, address(this), _stakingAmount);    
 
-        // Update Staking Balance
-        stakingBalance[msg.sender] = stakingBalance[msg.sender] + _amount;
+        _stakingBalance[msg.sender] = _stakingBalance[msg.sender] + _stakingAmount;     // Updates staking balance
 
-        if(!hasStaked[msg.sender]){
-            stakers.push(msg.sender);
+        // Checks if the user account has previously staked or not     
+        if(! _hasStaked[msg.sender]) {
+            _stakers.push(msg.sender);                                                   // If the user has not staked then add him to the list of stakers
         }
 
-        // Update Staking Balance
-        isStaking[msg.sender] = true;
-        hasStaked[msg.sender] = true;
+        _isStaking[msg.sender] = true;                                                   // Set true for user isStaking
+        _hasStaked[msg.sender] = true;                                                   // Set true for user hasStaked
+        
     }
 
-    // unstake tokens
-    function unstakeTokens() public {
-        uint balance = stakingBalance[msg.sender];
-        // require the amount to be greater than zero
-        require(balance > 0, 'staking balance cannot be less than zero');
+    // Function to unstake tokens
+    function _unstakeTokens() public {
 
-        // transfer the tokens to the specified contract address from our bank
-        tether.transfer(msg.sender, balance);
-
-        // reset staking balance
-        stakingBalance[msg.sender] = 0;
-
-        // Update Staking Status
-        isStaking[msg.sender] = false;
+        uint256 _balance = _stakingBalance[msg.sender];                                  // Stores the token amount of user account to _balance
+        require(_balance > 0, 'Cannot unstake 0 token');                                 // Token for unstaking cannot be 0
+        // Calls transfer function from Tether contract and
+        // Transfer the tokens to unstake
+        _Tether._transfer(msg.sender, _balance);                                        
+        _stakingBalance[msg.sender] = 0;                                                 // Set the staking balance of user to 0
+        _isStaking[msg.sender] = false;                                                  // Set false for user isStaking
     }
 
-    // issue rewards
-    function issueTokens() public {
-        // Only owner can call this function
-        require(msg.sender == owner, 'caller must be the owner');
+    // Function to issue reward tokens to the user account
+    function _issueRewardTokens() public {
 
-        // issue tokens to all stakers
-        for (uint i=0; i<stakers.length; i++) {
-            address recipient = stakers[i]; 
-            uint balance = stakingBalance[recipient] / 9;
+        // Only owner can issue reward tokens to the user account
+        require(msg.sender == _owner, 'Only owner can issue reward tokens');
 
-            if(balance > 0) {
-                rewardToken.transfer(recipient, balance);
-
-            }
-
-        }
-
-    }
-
+        for(uint256 i=0; i < _stakers.length; i++) {
+            address _recipient = _stakers[i];                                            // Access the stakers array and store each member to recipient one at a time
+            uint256 _rewardToken = _stakingBalance[_recipient] / 9;                      // Calculate the reward token
+            
+            require(_rewardToken > 0, 'Reward Token cannot be 0');                       // Reward Token cannot be 0 when issue
+            _RewardToken._transfer(_recipient, _rewardToken);                            // Calls transfer function from RewardToken contract and
+        }                                                                                // Issue reward tokens to the recipient
+    } 
 }
